@@ -134,5 +134,5 @@ dmypy.json
 requirements_2.txt
 
 media
-backup_bd
+postman-collection/backup_db/
 
