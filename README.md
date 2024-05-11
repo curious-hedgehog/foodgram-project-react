@@ -1,16 +1,22 @@
-# praktikum_new_diplom
+# Foodgram
 
 ### Описание проекта:
-Проект Foodgram представляет собой платформу для сбора отзывов пользователей на различные произведения, такие как книги, фильмы и музыка. Пользователи могут оставлять отзывы, ставить оценки и комментировать произведения. Проект реализован на основе Django, используя Django REST Framework для создания API.
+Foodgram представляет собой платформу для публикования рецептов блюд.
+Рецепты можно добавлять в избранное и список покупок.
+Проект реализован на основе Django, используя Django REST Framework для создания API.
 
+### Данные для ревью:
+https://foodkilogram.ddns.net/
+admin
+i7ZqtUp9FwBW5HUT
 
 ### Как запустить проект:
 
 1. Клонировать репозиторий и перейти в него в командной строке:
 
 ```bash
-git clone https://github.com/PepegaBoss/api_yamdb.git
-cd api_yamdb
+git clone git@github.com:BadChemist/foodgram-project-react.git
+cd foodgram-project-react
 ```
 
 2. Создать и активировать виртуальное окружение:
@@ -19,7 +25,7 @@ cd api_yamdb
 python3 -m venv env
 ```
 
-- Если у вас Linux/macOS:
+- Если у вас Linux/MacOS:
 
 ```bash
 source env/bin/activate
@@ -50,14 +56,10 @@ python3 manage.py migrate
 python3 manage.py runserver
 ```
 
-### Загрузка данных из CSV-файлов:
+### Импорт ингредиентов:
 
-Чтобы загрузить данные из CSV-файлов в базу данных проекта, выполните следующие шаги:
-
-1. Убедитесь, что вы находитесь в корневой директории проекта `api_yamdb`.
-
-2. Запустите команду загрузки данных из CSV-файлов с помощью следующей команды в терминале:
+Загрузить список ингредиентов в базу данных проекта можно с помощью команды:
 
 ```bash
-python manage.py load_data
+python manage.py load_ingredients
 ```
