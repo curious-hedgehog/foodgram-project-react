@@ -1,7 +1,7 @@
-from django.contrib import admin
 from django import forms
+from django.contrib import admin
 
-from api.models import Tag, Ingredient, Recipe, RecipeIngredient
+from api.models import Ingredient, Recipe, RecipeIngredient, Tag
 
 
 class RecipeForm(forms.ModelForm):
@@ -11,8 +11,15 @@ class RecipeForm(forms.ModelForm):
 
     class Meta:
         model = Recipe
-        fields = ('author', 'name', 'text', 'image',
-                  'cooking_time', 'tags', 'favorited_times',)
+        fields = (
+            'author',
+            'name',
+            'text',
+            'image',
+            'cooking_time',
+            'tags',
+            'favorited_times',
+        )
 
     def get_initial_for_field(self, field, field_name):
         initial = super().get_initial_for_field(field, field_name)

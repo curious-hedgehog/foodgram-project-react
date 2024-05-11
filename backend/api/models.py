@@ -1,9 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.db import models
-from django.core.exceptions import ValidationError
-from django.utils.translation import gettext_lazy as _
 
-from api.constants import SHORT_FIELD_MAX_LENGTH, LONG_FIELD_MAX_LENGTH
+from api.constants import LONG_FIELD_MAX_LENGTH, SHORT_FIELD_MAX_LENGTH
 from api.validators import validate_positive
 
 User = get_user_model()
@@ -93,4 +91,5 @@ class RecipeIngredient(models.Model):
             models.UniqueConstraint(
                 fields=['recipe', 'ingredient'],
                 name='unique ingredients for recipe'
-        )]
+            )
+        ]

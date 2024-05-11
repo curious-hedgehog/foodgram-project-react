@@ -43,21 +43,30 @@ class RecipeViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         recipe = serializer.save()
-        result_serializer = RecipeSerializer(recipe, context={'request': request})
+        result_serializer = RecipeSerializer(
+            recipe, context={'request': request}
+        )
         headers = self.get_success_headers(serializer.data)
-        return Response(result_serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        return Response(
+            result_serializer.data,
+            status=status.HTTP_201_CREATED,
+            headers=headers
+        )
 
     def update(self, request, *args, **kwargs):
-        partial = kwargs.pop('partial', False)
         instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=False)
+        serializer = self.get_serializer(
+            instance, data=request.data, partial=False
+        )
         serializer.is_valid(raise_exception=True)
         recipe = serializer.save()
 
         if getattr(instance, '_prefetched_objects_cache', None):
             instance._prefetched_objects_cache = {}
 
-        result_serializer = RecipeSerializer(recipe, context={'request': request})
+        result_serializer = RecipeSerializer(
+            recipe, context={'request': request}
+        )
 
         return Response(result_serializer.data)
 
@@ -75,13 +84,18 @@ class FavoriteView(generics.CreateAPIView, generics.DestroyAPIView):
 
     def create(self, request, *args, **kwargs):
         recipe = Recipe.objects.filter(id=kwargs['recipe_id'])
-        if not recipe.exists() or recipe.first() in request.user.favorites.all():
+        if (
+                not recipe.exists()
+                or recipe.first() in request.user.favorites.all()
+        ):
             return Response(status=status.HTTP_400_BAD_REQUEST)
         recipe = recipe.first()
         request.user.favorites.add(recipe)
         serializer = self.get_serializer(recipe)
         headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        return Response(
+            serializer.data, status=status.HTTP_201_CREATED, headers=headers
+        )
 
     def delete(self, request, *args, **kwargs):
         recipe = get_object_or_404(Recipe, id=kwargs['recipe_id'])
@@ -99,13 +113,18 @@ class ShoppingCartView(generics.CreateAPIView, generics.DestroyAPIView):
 
     def create(self, request, *args, **kwargs):
         recipe = Recipe.objects.filter(id=kwargs['recipe_id'])
-        if not recipe.exists() or recipe.first() in request.user.shopping_cart.all():
+        if (
+                not recipe.exists()
+                or recipe.first() in request.user.shopping_cart.all()
+        ):
             return Response(status=status.HTTP_400_BAD_REQUEST)
         recipe = recipe.first()
         request.user.shopping_cart.add(recipe)
         serializer = self.get_serializer(recipe)
         headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        return Response(
+            serializer.data, status=status.HTTP_201_CREATED, headers=headers
+        )
 
     def delete(self, request, *args, **kwargs):
         recipe = get_object_or_404(Recipe, id=kwargs['recipe_id'])
@@ -131,7 +150,8 @@ def download_shopping_cart(request):
     pieces_response_list = []
     for ingredient in ingredients:
         pieces_response_list.append(
-            f'{ingredient.name}: {total_amounts[ingredient.id]} {ingredient.measurement_unit}\n'
+            f'{ingredient.name}: {total_amounts[ingredient.id]} '
+            f'{ingredient.measurement_unit}\n'
         )
     response_text = ''.join(pieces_response_list)
     return Response(response_text, status=status.HTTP_200_OK)

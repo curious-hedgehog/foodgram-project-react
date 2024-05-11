@@ -1,5 +1,6 @@
 import csv
 import os.path
+
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 
@@ -26,7 +27,9 @@ class Command(BaseCommand):
                     '"name" и "measurement_unit"'
                 )
             for row in csv_reader:
-                row = {key.lower(): value.lower() for key, value in row.items()}
+                row = {
+                    key.lower(): value.lower() for key, value in row.items()
+                }
                 if Ingredient.objects.filter(**row).exists():
                     skipped_ingredients += 1
                     self.stdout.write(

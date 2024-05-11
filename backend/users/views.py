@@ -1,17 +1,13 @@
 from django.contrib.auth import get_user_model
 from rest_framework import (
     generics,
-    mixins,
-    status,
     permissions,
-    viewsets,
+    status,
 )
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
-from djoser.views import UserViewSet as DjoserUserViewSet
 
 from api.serializers import UserFollowingSerializer
-from .serializers import UserSerializer, UserCreateSerializer
 
 User = get_user_model()
 
@@ -41,7 +37,9 @@ class FollowCreateDestroyView(generics.CreateAPIView, generics.DestroyAPIView):
         follower.followings.add(following)
         serializer = self.get_serializer(following)
         headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        return Response(
+            serializer.data, status=status.HTTP_201_CREATED, headers=headers
+        )
 
     def delete(self, request, *args, **kwargs):
         follower = request.user
