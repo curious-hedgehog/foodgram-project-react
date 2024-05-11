@@ -3,45 +3,27 @@ from django.db import models
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
-from api.constants import NAME_MAX_LENGTH, COLOR_MAX_LENGTH, UNIT_MAX_LENGTH
-
-from api.constants import SLUG_MAX_LENGTH
+from api.constants import SHORT_FIELD_MAX_LENGTH, LONG_FIELD_MAX_LENGTH
+from api.validators import validate_positive
 
 User = get_user_model()
 
 
-def validate_positive(value):
-    if value <= 0:
-        raise ValidationError(
-            _("%(value)s не является положительным числом"),
-            params={"value": value},
-        )
-
-
 class Tag(models.Model):
     name = models.CharField(
-        max_length=NAME_MAX_LENGTH, verbose_name='Название'
+        max_length=LONG_FIELD_MAX_LENGTH, verbose_name='Название'
     )
-    color = models.CharField(verbose_name='Цветовой код', max_length=COLOR_MAX_LENGTH)
-    slug = models.SlugField(unique=True, max_length=SLUG_MAX_LENGTH,
-                            verbose_name='Slug')
+    color = models.CharField(
+        max_length=SHORT_FIELD_MAX_LENGTH, verbose_name='Цветовой код'
+    )
+    slug = models.SlugField(
+        max_length=SHORT_FIELD_MAX_LENGTH, verbose_name='Slug', unique=True
+    )
 
     class Meta:
         verbose_name = 'Тег'
         verbose_name_plural = 'Теги'
-
-    def __str__(self):
-        return self.name
-
-
-class Unit(models.Model):
-    name = models.CharField(
-        max_length=UNIT_MAX_LENGTH, verbose_name='Название'
-    )
-
-    class Meta:
-        verbose_name = 'Единица измерения'
-        verbose_name_plural = 'Единицы измерения'
+        ordering = ('name',)
 
     def __str__(self):
         return self.name
@@ -49,15 +31,17 @@ class Unit(models.Model):
 
 class Ingredient(models.Model):
     name = models.CharField(
-        max_length=NAME_MAX_LENGTH, verbose_name='Название'
+        max_length=LONG_FIELD_MAX_LENGTH, verbose_name='Название'
     )
-    measurement_unit = models.CharField(max_length=UNIT_MAX_LENGTH,
-                             verbose_name='Единица измерения')
+    measurement_unit = models.CharField(
+        max_length=SHORT_FIELD_MAX_LENGTH, verbose_name='Единица измерения'
+    )
 
     class Meta:
         default_related_name = 'ingredients'
         verbose_name = 'Ингредиент'
         verbose_name_plural = 'Ингредиенты'
+        ordering = ('name',)
 
     def __str__(self):
         return self.name
@@ -68,20 +52,24 @@ class Recipe(models.Model):
         User, on_delete=models.CASCADE, verbose_name='Автор'
     )
     name = models.CharField(
-        max_length=NAME_MAX_LENGTH, verbose_name='Название'
+        max_length=LONG_FIELD_MAX_LENGTH, verbose_name='Название'
     )
     image = models.ImageField(verbose_name='Изображение')
-    description = models.TextField(verbose_name='Описание')
-    tags = models.ManyToManyField(Tag)
+    text = models.TextField(verbose_name='Описание')
     cooking_time = models.IntegerField(
-        verbose_name='Время приготовления',
-        validators=[validate_positive]
+        verbose_name='Время приготовления', validators=(validate_positive,)
     )
+    tags = models.ManyToManyField(Tag)
 
     class Meta:
         default_related_name = 'recipes'
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
+        ordering = ('id',)
+
+    @property
+    def favorited_times(self):
+        return self.subscribers.count()
 
     def __str__(self):
         return self.name
@@ -94,11 +82,13 @@ class RecipeIngredient(models.Model):
     ingredient = models.ForeignKey(
         Ingredient, related_name='recipes', on_delete=models.CASCADE
     )
-    amount = models.IntegerField(verbose_name='Количество', validators=[validate_positive])
+    amount = models.IntegerField(
+        verbose_name='Количество', validators=(validate_positive,)
+    )
 
     class Meta:
-        verbose_name = 'Пара "Рецепт - ингредиент"'
-        verbose_name_plural = 'Пары "Рецепт - ингредиент"'
+        verbose_name = 'Пара "Рецепт - Ингредиент"'
+        verbose_name_plural = 'Пары "Рецепт - Ингредиент"'
         constraints = [
             models.UniqueConstraint(
                 fields=['recipe', 'ingredient'],

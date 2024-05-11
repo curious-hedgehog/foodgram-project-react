@@ -1,9 +1,8 @@
 import os
-from datetime import timedelta
 from pathlib import Path
 
-from dotenv import load_dotenv
 from django.core.management.utils import get_random_secret_key
+from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -137,8 +136,9 @@ DJOSER = {
     },
     'PERMISSIONS': {
         'user_list': ['rest_framework.permissions.AllowAny'],
-        'user': ['rest_framework.permissions.AllowAny'],
-        'current_user': ['rest_framework.permissions.IsAuthenticated'],
+        'user':  ['users.permissions.IsAuthenticatedForMeEndpoint'],
     },
     'LOGIN_FIELD': 'email',
 }
+
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 3000

@@ -1,39 +1,26 @@
 from django.contrib.auth import get_user_model
-from rest_framework import generics, status, permissions
-from rest_framework import mixins, viewsets
+from rest_framework import (
+    generics,
+    mixins,
+    status,
+    permissions,
+    viewsets,
+)
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
+from djoser.views import UserViewSet as DjoserUserViewSet
 
-from .serializers import UserSerializer, UserCreateSerializer, FollowingUserSerializer
+from api.serializers import UserFollowingSerializer
+from .serializers import UserSerializer, UserCreateSerializer
 
 User = get_user_model()
-
-
-class ListCreateRetrieveMixin(
-    mixins.ListModelMixin,
-    mixins.CreateModelMixin,
-    mixins.RetrieveModelMixin,
-    viewsets.GenericViewSet
-):
-    pass
-
-class UserViewSet(ListCreateRetrieveMixin):
-    """Вью-класс для пользователей."""
-
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-
-    def get_serializer_class(self):
-        if self.action in ('list', 'retrieve'):
-            return UserSerializer
-        return UserCreateSerializer
 
 
 class FollowListView(generics.ListAPIView):
     """Вью-класс для списка подписок."""
 
     queryset = User.objects.all()
-    serializer_class = FollowingUserSerializer
+    serializer_class = UserFollowingSerializer
 
     def get_queryset(self):
         return self.request.user.followings.order_by('id')
@@ -42,7 +29,7 @@ class FollowListView(generics.ListAPIView):
 class FollowCreateDestroyView(generics.CreateAPIView, generics.DestroyAPIView):
     """Вью-класс для создания и удаления подписок."""
 
-    serializer_class = FollowingUserSerializer
+    serializer_class = UserFollowingSerializer
     queryset = User.objects.all()
     permission_classes = [permissions.IsAuthenticated]
 
@@ -63,6 +50,3 @@ class FollowCreateDestroyView(generics.CreateAPIView, generics.DestroyAPIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
         follower.followings.remove(following)
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-

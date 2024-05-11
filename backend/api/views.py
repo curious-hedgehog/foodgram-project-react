@@ -1,17 +1,20 @@
 from collections import defaultdict
 
-from django.forms import MultipleChoiceField
-from django.forms.fields import CharField
-from rest_framework import viewsets, permissions, filters, generics, status
-from django_filters import rest_framework as df_filters, Filter
+from rest_framework import filters, generics, permissions, status, viewsets
 from rest_framework.decorators import api_view
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
-from api.models import Tag, Ingredient, Recipe
+from api.filters import RecipeFilter
+from api.models import Ingredient, Recipe, Tag
 from api.permissions import IsOwnerOrAdminOrReadOnly
-from api.serializers import TagSerializer, IngredientSerializer, RecipeSerializer
-from users.serializers import RecipeShortSerializer
+from api.serializers import (
+    IngredientSerializer,
+    RecipeSerializer,
+    RecipeShortSerializer,
+    RecipeWriteSerializer,
+    TagSerializer
+)
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
@@ -30,76 +33,45 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     search_fields = ('^name',)
 
 
-BOOLEAN_CHOICES = (
-    (0, 'false'),
-    (1, 'true'),
-)
-
-
-class MultipleValueField(MultipleChoiceField):
-    def __init__(self, *args, field_class, **kwargs):
-        self.inner_field = field_class()
-        super().__init__(*args, **kwargs)
-
-    def valid_value(self, value):
-        return self.inner_field.validate(value)
-
-    def clean(self, values):
-        return values and [self.inner_field.clean(value) for value in values]
-
-
-class MultipleValueFilter(Filter):
-    field_class = MultipleValueField
-
-    def __init__(self, *args, field_class, **kwargs):
-        kwargs.setdefault('lookup_expr', 'in')
-        super().__init__(*args, field_class=field_class, **kwargs)
-
-
-class RecipeFilter(df_filters.FilterSet):
-    author = df_filters.NumberFilter(field_name='author')
-    tags = MultipleValueFilter(field_name='tags__slug', field_class=CharField)
-    is_in_shopping_cart = df_filters.NumberFilter(
-        method='filter_is_in_shopping_cart')
-    is_favorited = df_filters.NumberFilter(
-        method='filter_is_favorited')
-
-    def filter_is_in_shopping_cart(self, queryset, name, value):
-        if not self.request.auth:
-            return queryset
-        if value == 1:
-            queryset &= self.request.user.shopping_cart.all()
-        return queryset
-
-    def filter_is_favorited(self, queryset, name, value):
-        if not self.request.auth:
-            return queryset
-        if value == 1:
-            queryset &= self.request.user.favorites.all()
-        return queryset
-
-    def my_custom_filter(self, queryset, name, value):
-        return queryset.filter(**{
-            name: value,
-        })
-
-    class Meta:
-        model = Recipe
-        fields = ['author', 'tags',]
-
-
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
     permission_classes = (IsOwnerOrAdminOrReadOnly,)
     filterset_class = RecipeFilter
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        recipe = serializer.save()
+        result_serializer = RecipeSerializer(recipe, context={'request': request})
+        headers = self.get_success_headers(serializer.data)
+        return Response(result_serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
-class FavoriteCreateDestroyView(generics.CreateAPIView, generics.DestroyAPIView):
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=False)
+        serializer.is_valid(raise_exception=True)
+        recipe = serializer.save()
+
+        if getattr(instance, '_prefetched_objects_cache', None):
+            instance._prefetched_objects_cache = {}
+
+        result_serializer = RecipeSerializer(recipe, context={'request': request})
+
+        return Response(result_serializer.data)
+
+    def get_serializer_class(self):
+        if self.action in ('list', 'retrieve',):
+            return RecipeSerializer
+        return RecipeWriteSerializer
+
+
+class FavoriteView(generics.CreateAPIView, generics.DestroyAPIView):
 
     serializer_class = RecipeShortSerializer
     queryset = Recipe.objects.all()
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = (permissions.IsAuthenticated,)
 
     def create(self, request, *args, **kwargs):
         recipe = Recipe.objects.filter(id=kwargs['recipe_id'])
@@ -119,7 +91,7 @@ class FavoriteCreateDestroyView(generics.CreateAPIView, generics.DestroyAPIView)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class ShoppingCartCreateDestroyView(generics.CreateAPIView, generics.DestroyAPIView):
+class ShoppingCartView(generics.CreateAPIView, generics.DestroyAPIView):
 
     serializer_class = RecipeShortSerializer
     queryset = Recipe.objects.all()
