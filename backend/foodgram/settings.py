@@ -147,6 +147,7 @@ DJOSER = {
         'user': ['users.permissions.IsAuthenticatedForMeEndpoint'],
     },
     'LOGIN_FIELD': 'email',
+    'HIDE_USERS': False,
 }
 
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 3000

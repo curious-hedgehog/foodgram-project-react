@@ -61,7 +61,7 @@ class Recipe(models.Model):
     cooking_time = models.IntegerField(
         verbose_name='Время приготовления', validators=(validate_positive,)
     )
-    tags = models.ManyToManyField(Tag)
+    tags = models.ManyToManyField(Tag, verbose_name='Теги')
 
     class Meta:
         default_related_name = 'recipes'

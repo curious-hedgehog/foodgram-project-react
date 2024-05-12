@@ -8,7 +8,7 @@ User = get_user_model()
 
 class UserModelAdmin(UserAdmin):
     list_filter = ('is_staff', 'is_superuser', 'is_active',
-                   'groups', 'email', 'username',)
+                   'groups', 'email', 'first_name',)
     filter_horizontal = ('groups', 'user_permissions', 'favorites',
                          'shopping_cart', 'followings',)
     fieldsets = (
