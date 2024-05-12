@@ -2,6 +2,7 @@ from django.forms import MultipleChoiceField
 from django.forms.fields import CharField
 from django_filters import Filter
 from django_filters import rest_framework as filters
+from django_filters.constants import EMPTY_VALUES
 
 from api.models import Recipe
 
@@ -24,6 +25,15 @@ class MultipleValueFilter(Filter):
     def __init__(self, *args, field_class, **kwargs):
         kwargs.setdefault('lookup_expr', 'in')
         super().__init__(*args, field_class=field_class, **kwargs)
+
+    def filter(self, qs, value):
+        if value in EMPTY_VALUES:
+            return qs
+        if self.distinct:
+            qs = qs.distinct()
+        lookup = "%s__%s" % (self.field_name, self.lookup_expr)
+        qs = self.get_method(qs)(**{lookup: value}).distinct()
+        return qs
 
 
 class RecipeFilter(filters.FilterSet):
