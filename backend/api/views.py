@@ -1,11 +1,13 @@
 from collections import defaultdict
 
+from django.http import HttpResponse
 from django.shortcuts import render
 from rest_framework import filters, generics, permissions, status, viewsets
 from rest_framework.decorators import api_view
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
+from api.constants import SHOPPING_CART_FILENAME
 from api.filters import RecipeFilter
 from api.models import Ingredient, Recipe, Tag
 from api.permissions import IsOwnerOrAdminOrReadOnly
@@ -125,7 +127,7 @@ class ShoppingCartView(generics.CreateAPIView, generics.DestroyAPIView):
 
     def delete(self, request, *args, **kwargs):
         recipe = get_object_or_404(Recipe, id=kwargs['recipe_id'])
-        if recipe not in request.user.favorites.all():
+        if recipe not in request.user.shopping_cart.all():
             return Response(status=status.HTTP_400_BAD_REQUEST)
         request.user.shopping_cart.remove(recipe)
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -137,21 +139,26 @@ def download_shopping_cart(request):
     if not request.auth:
         return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-    pieces = request.user.shopping_cart.values_list(
+    ingredients_counted = request.user.shopping_cart.values_list(
         'ingredients__ingredient', 'ingredients__amount'
     )
     total_amounts = defaultdict(int)
-    for ingredient, amount in pieces:
+    for ingredient, amount in ingredients_counted:
         total_amounts[ingredient] += amount
-    ingredients = Ingredient.objects.filter(id__in=total_amounts)
-    pieces_response_list = []
-    for ingredient in ingredients:
-        pieces_response_list.append(
-            f'{ingredient.name}: {total_amounts[ingredient.id]} '
-            f'{ingredient.measurement_unit}\n'
-        )
-    response_text = ''.join(pieces_response_list)
-    return Response(response_text, status=status.HTTP_200_OK)
+    ingredient_list = [
+        f'{ingredient.name} ({ingredient.measurement_unit}) — '
+        f'{total_amounts[ingredient.id]}\n'
+        for ingredient in Ingredient.objects.filter(id__in=total_amounts)
+    ]
+    response = HttpResponse(
+        ''.join(ingredient_list),
+        status=status.HTTP_200_OK,
+        content_type='text/plain',
+        charset='UTF-8'
+    )
+    response['Content-Disposition'] = (
+        f'attachment; filename={0}'.format(SHOPPING_CART_FILENAME))
+    return response
 
 
 def handler404_view(request, exception):

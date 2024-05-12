@@ -24,8 +24,8 @@ services:
       - static:/usr/share/nginx/html/
       - media:/var/www/foodgram/media/
       - ../docs/:/usr/share/nginx/html/api/docs/
-    depends_on:
-      - backend
+#    depends_on:
+#      - backend
 
   db:
     image: postgres:13.0-alpine
@@ -34,12 +34,14 @@ services:
     env_file: .env
     volumes:
       - db_data:/var/lib/postgresql/data
-
-  backend:
-    build: ../backend/
-    env_file: .env
-    depends_on:
-      - db
-    volumes:
-      - static:/backend_static
-      - media:/var/www/foodgram/media/
+#
+#  backend:
+#    build:
+#      context: ../backend
+#      dockerfile: Dockerfile
+#    env_file: .env
+#    depends_on:
+#      - db
+#    volumes:
+#      - static:/backend_static
+#      - media:/var/www/foodgram/media/
