@@ -1,5 +1,6 @@
 from collections import defaultdict
 
+from django.shortcuts import render
 from rest_framework import filters, generics, permissions, status, viewsets
 from rest_framework.decorators import api_view
 from rest_framework.generics import get_object_or_404
@@ -151,3 +152,9 @@ def download_shopping_cart(request):
         )
     response_text = ''.join(pieces_response_list)
     return Response(response_text, status=status.HTTP_200_OK)
+
+
+def handler404_view(request, exception):
+    return render(
+        request=request, template_name='errors/error_page.html', status=404
+    )

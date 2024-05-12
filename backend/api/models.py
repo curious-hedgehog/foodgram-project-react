@@ -54,6 +54,10 @@ class Recipe(models.Model):
     )
     image = models.ImageField(verbose_name='Изображение')
     text = models.TextField(verbose_name='Описание')
+    pub_date = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Добавлено'
+    )
     cooking_time = models.IntegerField(
         verbose_name='Время приготовления', validators=(validate_positive,)
     )
@@ -63,11 +67,7 @@ class Recipe(models.Model):
         default_related_name = 'recipes'
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
-        ordering = ('id',)
-
-    @property
-    def favorited_times(self):
-        return self.subscribers.count()
+        ordering = ('-pub_date',)
 
     def __str__(self):
         return self.name
@@ -93,3 +93,6 @@ class RecipeIngredient(models.Model):
                 name='unique ingredients for recipe'
             )
         ]
+
+    def __str__(self):
+        return f'{self.recipe} - {self.ingredient}'

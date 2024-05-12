@@ -6,7 +6,8 @@ from api.models import Ingredient, Recipe, RecipeIngredient, Tag
 
 class RecipeForm(forms.ModelForm):
     favorited_times = forms.IntegerField(
-        widget=forms.NumberInput(attrs={'readonly': 'readonly'})
+        widget=forms.NumberInput(attrs={'readonly': 'readonly'}),
+        initial=0,
     )
 
     class Meta:
@@ -23,8 +24,11 @@ class RecipeForm(forms.ModelForm):
 
     def get_initial_for_field(self, field, field_name):
         initial = super().get_initial_for_field(field, field_name)
-        if field_name == 'favorited_times':
-            initial = self.instance.favorited_times
+        if (
+                field_name == 'favorited_times'
+                and self.instance in Recipe.objects.all()
+        ):
+            initial = self.instance.subscribers.count()
         return initial
 
 
@@ -37,7 +41,6 @@ class RecipeAdmin(admin.ModelAdmin):
 
 class IngredientAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'measurement_unit',)
-    # list_filter = ('name',)
     list_display_links = ('id', 'name',)
     search_fields = ('name',)
 
