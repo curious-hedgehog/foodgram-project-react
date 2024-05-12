@@ -61,5 +61,5 @@ python3 manage.py runserver
 Загрузить список ингредиентов в базу данных проекта можно с помощью команды:
 
 ```bash
-python manage.py load_ingredients
+python manage.py loadingredients
 ```

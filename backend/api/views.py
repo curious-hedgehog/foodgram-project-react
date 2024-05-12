@@ -8,13 +8,9 @@ from rest_framework.response import Response
 from api.filters import RecipeFilter
 from api.models import Ingredient, Recipe, Tag
 from api.permissions import IsOwnerOrAdminOrReadOnly
-from api.serializers import (
-    IngredientSerializer,
-    RecipeSerializer,
-    RecipeShortSerializer,
-    RecipeWriteSerializer,
-    TagSerializer
-)
+from api.serializers import (IngredientSerializer, RecipeSerializer,
+                             RecipeShortSerializer, RecipeWriteSerializer,
+                             TagSerializer)
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):

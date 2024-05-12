@@ -1,6 +1,7 @@
 from django.forms import MultipleChoiceField
 from django.forms.fields import CharField
-from django_filters import rest_framework as filters, Filter
+from django_filters import Filter
+from django_filters import rest_framework as filters
 
 from api.models import Recipe
 
