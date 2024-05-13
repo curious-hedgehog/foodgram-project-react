@@ -14,4 +14,4 @@ if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL,
                           document_root=settings.MEDIA_ROOT)
 
-handler404 = 'api.views.handler404_view'
+handler404 = 'recipes.views.handler404_view'

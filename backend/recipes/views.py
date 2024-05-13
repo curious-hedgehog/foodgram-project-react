@@ -7,7 +7,7 @@ from rest_framework.decorators import api_view
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
-from api.permissions import IsOwnerOrAdminOrReadOnly
+from recipes.permissions import IsOwnerOrAdminOrReadOnly
 from recipes.constants import SHOPPING_CART_FILENAME
 from recipes.filters import RecipeFilter
 from recipes.models import Ingredient, Recipe, Tag
@@ -82,13 +82,9 @@ class FavoriteView(generics.CreateAPIView, generics.DestroyAPIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def create(self, request, *args, **kwargs):
-        recipe = Recipe.objects.filter(id=kwargs['recipe_id'])
-        if (
-                not recipe.exists()
-                or recipe.first() in request.user.favorites.all()
-        ):
+        recipe = get_object_or_404(Recipe, id=kwargs['recipe_id'])
+        if recipe in request.user.favorites.all():
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        recipe = recipe.first()
         request.user.favorites.add(recipe)
         serializer = self.get_serializer(recipe)
         headers = self.get_success_headers(serializer.data)
@@ -111,13 +107,9 @@ class ShoppingCartView(generics.CreateAPIView, generics.DestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
-        recipe = Recipe.objects.filter(id=kwargs['recipe_id'])
-        if (
-                not recipe.exists()
-                or recipe.first() in request.user.shopping_cart.all()
-        ):
+        recipe = get_object_or_404(Recipe, id=kwargs['recipe_id'])
+        if recipe in request.user.shopping_cart.all():
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        recipe = recipe.first()
         request.user.shopping_cart.add(recipe)
         serializer = self.get_serializer(recipe)
         headers = self.get_success_headers(serializer.data)

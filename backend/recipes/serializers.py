@@ -122,12 +122,14 @@ class RecipeSerializer(serializers.ModelSerializer):
         ingredients = validated_data.pop('ingredients')
         validated_data['author_id'] = self.context['request'].user.id
         recipe = super().create(validated_data)
-        for ingredient in ingredients:
-            RecipeIngredient.objects.create(
+        recipeingredients = [
+            RecipeIngredient(
                 recipe=recipe,
                 ingredient=ingredient['ingredient_id'],
                 amount=ingredient['amount'],
-            )
+            ) for ingredient in ingredients
+        ]
+        RecipeIngredient.objects.bulk_create(recipeingredients)
         return recipe
 
     def update(self, instance, validated_data):
@@ -172,13 +174,12 @@ class UserFollowingSerializer(serializers.ModelSerializer):
             id=obj.id).exists()
 
     def get_recipes(self, obj):
+        recipes = obj.recipes.all()
         recipes_limit = self.context.get('request').query_params.get(
             'recipes_limit'
         )
-        if recipes_limit is None or not recipes_limit.isdigit():
-            recipes = obj.recipes.all()
-        else:
-            recipes = obj.recipes.all()[:int(recipes_limit)]
+        if recipes_limit is not None and recipes_limit.isdigit():
+            recipes = recipes[:int(recipes_limit)]
         return RecipeShortSerializer(recipes, many=True).data
 
     @staticmethod
