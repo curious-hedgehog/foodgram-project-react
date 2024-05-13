@@ -135,12 +135,14 @@ class RecipeSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         ingredients = validated_data.pop('ingredients')
         instance.ingredients.all().delete()
-        for ingredient in ingredients:
-            RecipeIngredient.objects.create(
+        recipeingredients = [
+            RecipeIngredient(
                 recipe=instance,
                 ingredient=ingredient['ingredient_id'],
                 amount=ingredient['amount'],
-            )
+            ) for ingredient in ingredients
+        ]
+        RecipeIngredient.objects.bulk_create(recipeingredients)
         return super().update(instance, validated_data)
 
 
