@@ -2,7 +2,8 @@ from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
 from recipes.views import (FavoriteView, IngredientViewSet, RecipeViewSet,
-                           ShoppingCartView, TagViewSet, download_shopping_cart)
+                           ShoppingCartView, TagViewSet,
+                           download_shopping_cart)
 from users.views import FollowCreateDestroyView, FollowListView
 
 router = DefaultRouter()
