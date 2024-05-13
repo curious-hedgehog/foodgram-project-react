@@ -1,0 +1,16 @@
+[
+  {
+    "model": "users.usermodel",
+    "pk": 1,
+    "fields": {
+      "password": "pbkdf2_sha256$260000$1nDB2hY8rH5BsYLVuNIdwW$rMP17kAlz5u1mlo1Wea8e2SN44rPYrcFWw8cS5XpZ/Y=",
+      "last_login": "2024-05-12T16:34:07.746Z", "is_superuser": true, "username": "admin", "first_name": "Admin",
+      "last_name": "Adminov", "is_staff": true, "is_active": true, "date_joined": "2024-05-12T11:19:43.704Z",
+      "email": "admin@admin.ad",
+      "groups": [],
+      "user_permissions": [],
+      "favorites": [],
+      "shopping_cart": [],
+      "followings": []}},
+  {"model": "users.usermodel", "pk": 2, "fields": {"password": "pbkdf2_sha256$260000$VrPUmX7J2AcBbw93nW0MPt$0/uQYEDHSWUSMT4KUjyJy3piXNNF/u/pHVk92/JpGO4=", "last_login": "2024-05-12T16:14:22.232Z", "is_superuser": false, "username": "easy", "first_name": "Изя", "last_name": "Иванов", "is_staff": false, "is_active": true, "date_joined": "2024-05-12T13:29:46.725Z", "email": "easy@easy.ea", "groups": [], "user_permissions": [], "favorites": [], "shopping_cart": [], "followings": [1]}},
+  {"model": "users.usermodel", "pk": 3, "fields": {"password": "pbkdf2_sha256$260000$KNnnmBnTQDr0H8V4mHmyx4$Tt9xSC0MHpEiK7d4vI79z05q5LHal/2i38dTOsQipBU=", "last_login": "2024-05-12T13:47:25.307Z", "is_superuser": false, "username": "rodya", "first_name": "Родослав", "last_name": "Святославов", "is_staff": false, "is_active": true, "date_joined": "2024-05-12T13:47:08.931Z", "email": "rodya@rodya.ro", "groups": [], "user_permissions": [], "favorites": [], "shopping_cart": [], "followings": []}}]

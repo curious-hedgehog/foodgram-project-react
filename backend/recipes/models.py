@@ -1,8 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 
-from api.constants import LONG_FIELD_MAX_LENGTH, SHORT_FIELD_MAX_LENGTH
-from api.validators import validate_positive
+from recipes.constants import LONG_FIELD_MAX_LENGTH, SHORT_FIELD_MAX_LENGTH
+from recipes.validators import validate_positive
 
 User = get_user_model()
 

@@ -5,13 +5,13 @@ from django.db import models
 class UserModel(AbstractUser):
     email = models.EmailField(unique=True, verbose_name='Электронная почта')
     favorites = models.ManyToManyField(
-        'api.Recipe',
+        'recipes.Recipe',
         related_name='subscribers',
         verbose_name='Избранное',
         blank=True,
     )
     shopping_cart = models.ManyToManyField(
-        'api.Recipe',
+        'recipes.Recipe',
         related_name='cooking_chef',
         verbose_name='В списке покупок',
         blank=True,

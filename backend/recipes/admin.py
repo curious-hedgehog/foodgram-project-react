@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib import admin
 
-from api.models import Ingredient, Recipe, RecipeIngredient, Tag
+from recipes.models import Ingredient, Recipe, RecipeIngredient, Tag
 
 
 class RecipeForm(forms.ModelForm):

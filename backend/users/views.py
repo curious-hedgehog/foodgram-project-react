@@ -3,7 +3,7 @@ from rest_framework import generics, permissions, status
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
-from api.serializers import UserFollowingSerializer
+from recipes.serializers import UserFollowingSerializer
 
 User = get_user_model()
 

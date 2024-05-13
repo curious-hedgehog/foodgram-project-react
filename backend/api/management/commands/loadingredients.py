@@ -4,7 +4,7 @@ import os.path
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 
-from api.models import Ingredient
+from recipes.models import Ingredient
 
 
 class Command(BaseCommand):

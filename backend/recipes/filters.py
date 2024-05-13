@@ -4,7 +4,7 @@ from django_filters import Filter
 from django_filters import rest_framework as filters
 from django_filters.constants import EMPTY_VALUES
 
-from api.models import Recipe
+from recipes.models import Recipe
 
 
 class MultipleValueField(MultipleChoiceField):
