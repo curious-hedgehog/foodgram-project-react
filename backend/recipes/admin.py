@@ -32,13 +32,34 @@ class RecipeForm(forms.ModelForm):
         return initial
 
 
+class RecipeIngredientInlineFormset(forms.models.BaseInlineFormSet):
+    def clean(self):
+        count = 0
+        for form in self.forms:
+            try:
+                if form.cleaned_data:
+                    count += 1
+            except AttributeError:
+                pass
+        if count < 1:
+            raise forms.ValidationError('Добавьте хотя бы один ингредиент')
+
+
+class RecipeIngredientInline(admin.TabularInline):
+    model = RecipeIngredient
+    formset = RecipeIngredientInlineFormset
+
+
+@admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'author',)
     list_filter = ('author', 'name', 'tags',)
     list_display_links = ('id', 'name',)
     form = RecipeForm
+    inlines = (RecipeIngredientInline,)
 
 
+@admin.register(Ingredient)
 class IngredientAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'measurement_unit',)
     list_display_links = ('id', 'name',)
@@ -46,6 +67,4 @@ class IngredientAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Tag)
-admin.site.register(Ingredient, IngredientAdmin)
-admin.site.register(Recipe, RecipeAdmin)
 admin.site.register(RecipeIngredient)
